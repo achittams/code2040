@@ -1,0 +1,184 @@
+require 'net/http'
+require 'json'
+
+uri = URI('http://challenge.code2040.org/api/register')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907', github: 'https://github.com/achittams/code2040'}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+#challenge 1
+require 'net/http'
+require 'json'
+
+uri = URI('http://challenge.code2040.org/api/reverse')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907'}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+str = res.body.reverse
+
+puts res.body
+puts str
+
+uri = URI('http://challenge.code2040.org/api/reverse/validate')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907', string: str}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+#challenge 2
+require 'net/http'
+require 'json'
+
+uri = URI('http://challenge.code2040.org/api/haystack')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907'}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+str = res.body.delete '{}'
+str.delete! '[]'
+str.delete! '""'
+
+
+arry = str.split('haystack')
+temparr = arry[0].split(':')
+needle = temparr[1]
+needle.delete! ','
+temparr2 = arry[1]
+temparr2.delete! ':'
+
+haystack = temparr2.split(',')
+
+idx = haystack.index(needle)
+puts idx 
+
+uri = URI('http://challenge.code2040.org/api/haystack/validate')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907', needle: idx}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+#challenge 3 
+require 'net/http'
+require 'json'
+
+uri = URI('http://challenge.code2040.org/api/prefix')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907'}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+str = res.body.delete '{}'
+str.delete! '[]'
+str.delete! '""'
+
+arry = str.split('array')
+temparr = arry[0].split(':')
+prefix= temparr[1]
+prefix.delete! ','
+temparr2 = arry[1]
+temparr2.delete! ':'
+finalarr = Array.new; 
+arrfind = temparr2.split(',')
+
+arrfind.each { |elm|
+    if !elm.include?(prefix) 
+        finalarr.push(elm)
+    end
+}
+puts finalarr
+
+uri = URI('http://challenge.code2040.org/api/prefix/validate')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907', array: finalarr}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+#challenge 4 
+require 'net/http'
+require 'json'
+
+uri = URI('http://challenge.code2040.org/api/dating')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907'}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
+
+str = res.body.delete '{}'
+str.delete! '""'
+
+arr = str.split(',')
+temparr1 = arr[0].split('datestamp:')
+temparr2 = arr[1].split('interval:')
+
+date = temparr1[1]
+sec = temparr2[1]
+puts date
+date =~ /([0-9]+)T([0-9]+):([0-9]+):([0-9]+)/
+firsec = $4.to_i
+firmin = $3.to_i
+firhour = $2.to_i
+firday = $1.to_i
+finsec = firsec + sec.to_i
+puts finsec
+mincount = firmin 
+finsec2 = finsec
+finsec = finsec - 60
+while finsec >= 0 do 
+    finsec2 = finsec
+    finsec = finsec - 60
+    mincount = mincount + 1 
+end 
+mincount2 = mincount 
+mincount = mincount - 60 
+hourcount = firhour
+while mincount >= 0 do 
+    mincount2 = mincount 
+    mincount = mincount - 60 
+    hourcount = hourcount + 1 
+end 
+
+hourcount2 = hourcount 
+hourcount = hourcount - 24 
+day = firday
+while hourcount >= 0 do
+    hourcount2 = hourcount 
+    hourcount = hourcount - 24 
+    day = day + 1 
+end
+dayf = day.to_s
+if(day <= 9) 
+    dayf = "0" + dayf
+end 
+hourcountf = hourcount2.to_s
+if(hourcount2 <= 9) 
+    hourcountf = "0" + hourcountf
+end
+
+minf = mincount2.to_s
+if(mincount2 <= 9) 
+    minf = "0" + minf
+end
+secf = finsec2.to_s
+if(finsec2 <= 9) 
+    secf = "0" + secf
+end
+
+finstr = "2016-09-" + dayf + "T" + hourcountf + ":" + minf + ":" + secf + "Z"
+puts finstr
+
+uri = URI('http://challenge.code2040.org/api/dating/validate')
+req = Net::HTTP::Post.new(uri, 'Content-Type' => 'application/json')
+req.body = {token: '793ea4dc58e78290511d3c7314b71907', datestamp: finstr}.to_json
+res = Net::HTTP.start(uri.hostname, uri.port) do |http|
+  http.request(req)
+end
